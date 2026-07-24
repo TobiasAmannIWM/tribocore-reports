@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GfT 2026 &middot; T132 &mdash; FAIR Data for DLC Tribology &middot; Fraunhofer IWM</title>
+<script src="../_assets/chart.min.js"></script>
+<script src="../_assets/d3.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:      #f9f9f7;
+  --surface: #fcfcfb;
+  --ink:     #0b0b0b;
+  --ink2:    #52514e;
+  --muted:   #898781;
+  --grid:    #e1e0d9;
+  --c1:      #2a78d6;
+  --c2:      #1baf7a;
+  --c3:      #eda100;
+  --c5:      #4a3aa7;
+  --c6:      #e34948;
+  --good:    #0ca30c;
+  --warn:    #fab219;
+  --font: system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+body { font-family:var(--font); background:var(--bg); color:var(--ink); min-height:100vh; }
+.header { background:#003366; color:#fff; padding:16px 32px; display:flex; align-items:center; gap:20px; }
+.hdr-logo { font-size:11px; font-weight:700; letter-spacing:.08em; border-right:1px solid rgba(255,255,255,.2); padding-right:20px; opacity:.9; }
+.hdr-title { font-size:17px; font-weight:700; }
+.hdr-sub   { font-size:11px; opacity:.5; margin-top:2px; }
+.hdr-badge { margin-left:auto; font-size:11px; background:rgba(42,120,214,.35); padding:4px 10px; border-radius:4px; }
+.hero { background:linear-gradient(135deg,#1a3a6e 0%,#0b1a38 100%); color:#fff; padding:28px 32px 24px; }
+.hero-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:1px; background:rgba(255,255,255,.1); border-radius:8px; overflow:hidden; margin-top:16px; }
+.hero-stat { background:rgba(255,255,255,.06); padding:18px 20px; text-align:center; }
+.hero-val  { font-size:32px; font-weight:800; font-variant-numeric:tabular-nums; }
+.hero-val.good { color:#4ade80; }
+.hero-val.blue { color:#60a5fa; }
+.hero-val.amber { color:#fbbf24; }
+.hero-lbl { font-size:11px; opacity:.6; margin-top:4px; }
+.hero-tagline { font-size:14px; opacity:.7; margin-top:6px; max-width:720px; line-height:1.6; }
+.tab-bar { background:var(--surface); border-bottom:2px solid var(--grid); padding:0 24px; display:flex; }
+.tab-btn { padding:13px 18px; font-size:13px; font-weight:500; color:var(--muted); cursor:pointer;
+           border:none; background:none; border-bottom:2px solid transparent;
+           margin-bottom:-2px; transition:all .15s; font-family:var(--font); }
+.tab-btn:hover { color:var(--ink); }
+.tab-btn.active { color:var(--c1); border-bottom-color:var(--c1); font-weight:700; }
+.panel { display:none; padding:22px 28px; }
+.panel.active { display:block; }
+.panel-title { font-size:17px; font-weight:700; margin-bottom:4px; }
+.panel-sub   { font-size:13px; color:var(--ink2); margin-bottom:20px; line-height:1.5; }
+.charts-2col { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:20px; }
+.chart-card { background:var(--surface); border:1px solid var(--grid); border-radius:8px; padding:16px 18px; }
+.chart-title { font-size:13px; font-weight:700; margin-bottom:2px; }
+.chart-sub   { font-size:11px; color:var(--muted); margin-bottom:14px; }
+.chart-wrap  { position:relative; height:280px; }
+.chart-wrap.tall { height:340px; }
+.insight-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:16px 0; }
+.insight { padding:13px 15px; border-radius:6px; border:1px solid var(--grid); background:var(--surface); }
+.insight b { display:block; font-size:12px; margin-bottom:4px; }
+.insight p { font-size:12px; color:var(--ink2); line-height:1.5; }
+.insight.blue  { border-left:3px solid var(--c1); background:#f0f7ff; }
+.callout { margin-bottom:18px; padding:13px 16px; border-radius:6px; font-size:13px; line-height:1.55; }
+.callout-info  { background:#edf4ff; border-left:3px solid var(--c1); color:#0d3a6b; }
+.callout-navy  { background:#001f3f; border-left:3px solid #4a90d9; color:#c8d8f0; }
+.pipeline { display:flex; align-items:center; gap:0; margin:20px 0; }
+.pipe-step { flex:1; background:var(--surface); border:1px solid var(--grid); border-radius:6px;
+             padding:12px 8px; text-align:center; position:relative; }
+.pipe-step:not(:last-child)::after { content:'→'; position:absolute; right:-18px; top:50%;
+  transform:translateY(-50%); font-size:20px; color:var(--muted); z-index:2; }
+.pipe-icon  { font-size:20px; margin-bottom:5px; }
+.pipe-label { font-size:11px; font-weight:700; color:var(--ink); }
+.pipe-sub   { font-size:10px; color:var(--muted); margin-top:2px; line-height:1.4; }
+.pipeline-gap { width:36px; flex-shrink:0; }
+.claim-card { border-left:3px solid #003366; background:#edf2fb; border-radius:6px; padding:12px 16px; margin-bottom:10px; }
+.claim-num  { font-size:17px; font-weight:800; color:#003366; margin-right:8px; }
+.claim-card h4 { display:inline; font-size:13px; font-weight:700; }
+.claim-card p  { font-size:12px; color:var(--ink2); margin-top:5px; line-height:1.5; }
+.pain-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:18px; }
+.pain-card { background:var(--surface); border:1px solid var(--grid); border-radius:8px; padding:14px; text-align:center; }
+.pain-icon { font-size:26px; margin-bottom:8px; }
+.pain-title { font-size:13px; font-weight:700; margin-bottom:6px; }
+.pain-text  { font-size:12px; color:var(--ink2); line-height:1.5; }
+.authors-table { border-collapse:collapse; width:100%; font-size:12px; margin:14px 0; }
+.authors-table th { background:#f0efec; font-size:11px; font-weight:700; color:var(--ink2); padding:8px 12px; border:1px solid var(--grid); }
+.authors-table td { padding:8px 12px; border:1px solid var(--grid); vertical-align:top; }
+.kg-wrap { display:flex; gap:14px; align-items:flex-start; }
+.kg-svg-wrap { flex:1; border:1px solid var(--grid); border-radius:6px; background:var(--surface); overflow:hidden; min-height:460px; }
+.kg-sidebar { width:200px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+.kg-card { background:var(--surface); border:1px solid var(--grid); border-radius:6px; padding:12px; }
+.kg-card-title { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; }
+.kg-leg-item { display:flex; align-items:center; gap:6px; margin-bottom:6px; font-size:11px; color:var(--ink2); }
+.kg-leg-icon { width:14px; height:14px; flex-shrink:0; }
+.kg-info { font-size:11px; color:var(--ink2); line-height:1.75; }
+.kg-info b { color:var(--ink); }
+.sparql-block { background:#1a1a2e; color:#c8d8f0; font-family:monospace; font-size:11px;
+                line-height:1.7; padding:14px 18px; border-radius:6px; margin:14px 0;
+                border-left:3px solid #4a90d9; overflow-x:auto; }
+.sparql-block .kw { color:#9dd3f7; font-weight:700; }
+.sparql-block .str { color:#f9c95a; }
+.sparql-block .cmt { color:#5566aa; }
+.stat-row { display:grid; gap:6px; margin:14px 0; }
+.stat-tile { background:var(--surface); border:1px solid var(--grid); border-radius:6px; padding:12px; text-align:center; }
+.stat-tile-val { font-size:20px; font-weight:800; color:var(--c1); }
+.stat-tile-lbl { font-size:10px; color:var(--ink2); margin-top:2px; }
+.kfold-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; margin:14px 0; }
+.kfold-col  { display:flex; flex-direction:column; gap:3px; }
+.kfold-hdr  { background:#003366; color:#fff; font-size:10px; font-weight:700; text-align:center; padding:5px; border-radius:3px; }
+.kfold-train { background:#a8c8f0; height:18px; border-radius:2px; }
+.kfold-test  { background:#E69F00; height:18px; border-radius:2px; }
+.kfold-legend { display:flex; gap:16px; font-size:11px; color:var(--ink2); margin-top:6px; }
+.kfold-swatch { width:14px; height:14px; border-radius:2px; display:inline-block; vertical-align:middle; margin-right:4px; }
+.r2-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0; }
+.r2-card { background:var(--surface); border:1px solid var(--grid); border-radius:8px; padding:16px; }
+.r2-card h4 { font-size:13px; font-weight:700; margin-bottom:6px; }
+.r2-val { font-size:26px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; }
+.badge-g { display:inline-block; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700; background:#d4f4d4; color:#006300; margin-left:6px; vertical-align:middle; }
+.badge-b { display:inline-block; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700; background:#dbeafe; color:#1e40af; margin-left:6px; vertical-align:middle; }
+.section-heading { font-size:15px; font-weight:700; color:var(--ink); margin:22px 0 12px; padding-bottom:6px; border-bottom:2px solid var(--grid); }
+.contact-card { background:#edf2fb; border:1px solid #b8cef0; border-radius:8px; padding:16px 20px; margin-top:16px; font-size:13px; color:var(--ink2); }
+.contact-card strong { color:#003366; }
+.node-label { font-size:9px; pointer-events:none; fill:var(--ink); font-family:var(--font); }
+.link-line { stroke-opacity:.35; }
+.link-line.highlighted { stroke-opacity:.9; }
+.link-line.dimmed { stroke-opacity:.05; }
+.node-shape.dimmed { opacity:.12; }
+.node-shape.highlighted { stroke:#0b0b0b !important; stroke-width:2.5 !important; }
+#tt { position:fixed; display:none; background:#1a1a19; color:#fff;
+      padding:10px 14px; border-radius:6px; font-size:12px; max-width:310px;
+      line-height:1.55; pointer-events:none; z-index:9999;
+      box-shadow:0 4px 20px rgba(0,0,0,.35); }
+#tt strong { display:block; margin-bottom:4px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="hdr-logo">Fraunhofer IWM</div>
+  <div>
+    <div class="hdr-title">GfT 2026 &middot; T132 &mdash; FAIR Data for DLC Tribology &middot; Fraunhofer IWM</div>
+    <div class="hdr-sub">67. Tribologie-Fachtagung GfT 2026 &middot; Talk T132 &middot; T. Amann et al.</div>
+  </div>
+  <div class="hdr-badge">GfT 2026 &middot; Conference Companion</div>
+</header>
+
+<div class="hero">
+  <div class="hero-tagline">
+    <strong>TriboCore KIDaT: FAIR-ready tribology data pipeline</strong> &mdash; raw CSV to queryable knowledge graph,
+    across 8 measurement methods, 52+ physics-based Kennwerte, cross-modal ML/SHAP for DLC friction.
+  </div>
+  <div class="hero-grid">
+    <div class="hero-stat"><div class="hero-val blue">134</div><div class="hero-lbl">B3P experiments (SupraSlide)</div></div>
+    <div class="hero-stat"><div class="hero-val blue">52+</div><div class="hero-lbl">Kennwerte per experiment</div></div>
+    <div class="hero-stat"><div class="hero-val good">0.005</div><div class="hero-lbl">ta-C Stribeck CoF min. (PAO)</div></div>
+    <div class="hero-stat"><div class="hero-val amber">35%</div><div class="hero-lbl">SHAP: Hertz pressure importance</div></div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('overview')">&#9450; Talk Overview</button>
+  <button class="tab-btn" onclick="showTab('platform')">&#9312; FAIR Platform</button>
+  <button class="tab-btn" onclick="showTab('dlc')">&#9313; DLC Results</button>
+  <button class="tab-btn" onclick="showTab('ml')">&#9314; ML &amp; SHAP</button>
+  <button class="tab-btn" onclick="showTab('kg')">&#9315; KG &amp; Industry</button>
+</div>
+
+<!-- ===== TAB 0: TALK OVERVIEW ===== -->
+<div id="panel-overview" class="panel active">
+  <div class="panel-title">&#9450; Talk Overview</div>
+  <div class="panel-sub">GfT 2026 &middot; Talk T132 &middot; Session: Tribological Data Management &amp; Digitalisation</div>
+
+  <div class="chart-card" style="margin-bottom:18px;">
+    <div class="chart-title">Abstract</div>
+    <p style="font-size:13px;line-height:1.65;margin-top:8px;color:var(--ink2);">
+      TriboCore KIDaT is a FAIR-ready tribology data pipeline at Fraunhofer IWM that processes raw instrument files
+      from eight measurement methods into a queryable knowledge graph (Neo4j + Fuseki) with full provenance.
+      Applied to DLC coatings (ta-C, a-C:H, a-C:H:Si) in the SupraSlide project, the pipeline extracts 52+ physics-based
+      Kennwerte per B3P experiment &mdash; including EHL film thickness (Hamrock-Dowson), Stribeck regime classification,
+      and Hertz contact pressure &mdash; and cross-links tribological experiments to rheometry and impedance spectroscopy
+      via shared lubricant IRI.
+      A Random Forest model trained on GroupKFold cross-validation identifies Hertz peak pressure as the dominant
+      predictor of CoF (SHAP importance ~35 %), ahead of coating composition and viscosity,
+      providing a statistically grounded priority for experimental design.
+    </p>
+  </div>
+
+  <table class="authors-table">
+    <thead><tr><th>Author</th><th>Institution</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><strong>T. Amann, M. Mee, A. Kailer</strong></td><td>Fraunhofer IWM, Freiburg</td><td>Tribology, data science, FAIR pipeline</td></tr>
+      <tr><td><strong>P. Klein, M. Bubel</strong></td><td>Fraunhofer ITWM, Kaiserslautern</td><td>Mathematical modelling, optimal experimental design</td></tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:20px;">
+    <div class="chart-title" style="margin-bottom:12px;">5 Key Findings</div>
+
+    <div class="claim-card">
+      <span class="claim-num">1</span><h4>Hertz pressure dominates CoF in lubricated DLC contacts</h4>
+      <p>SHAP feature importance: ~35 % for Hertz peak pressure &mdash; higher than coating composition and lubricant viscosity combined. Contact geometry is the primary optimisation lever.</p>
+    </div>
+    <div class="claim-card">
+      <span class="claim-num">2</span><h4>Automated FAIR integration across 8 measurement methods</h4>
+      <p>B3P, GLEX, SRV, Galling, Abrasion (tribological) + Rheo, EIS, IR, Raman, DC_Conductivity (characterisation) &mdash; all producing 52+ physics-based Kennwerte per experiment with full PROV-O provenance.</p>
+    </div>
+    <div class="claim-card">
+      <span class="claim-num">3</span><h4>Cross-modal linking: B3P &lt;-&gt; Rheology &lt;-&gt; EIS via shared lubricant IRI</h4>
+      <p>HAS_COMPLEMENTARY_DATA edges connect tribological experiments to characterisation experiments of the same lubricant in the same project. SPARQL federation-ready.</p>
+    </div>
+    <div class="claim-card">
+      <span class="claim-num">4</span><h4>First operational tribological PMDco-aligned OWL ontology (41 classes, v1.1)</h4>
+      <p>All 6 Hartrott/MaterialDigital recommendations implemented: PMDco crosswalk, IAO textual definitions, SHACL 0 violations, named graphs per method, RepeatGroup nodes, OWL subclass hierarchy.</p>
+    </div>
+    <div class="claim-card">
+      <span class="claim-num">5</span><h4>DPP data foundation: PFAS status, GWP, SVHC &mdash; SPARQL-queryable</h4>
+      <p>Every lubricant carries regulatory metadata (PFAS-free/restricted/unknown, GWP in kg CO&#8322;-eq/kg, SVHC flag). ESPR 2027 DPP data feed validated against PMDco v3.0 and SHACL shapes.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 1: FAIR PLATFORM ===== -->
+<div id="panel-platform" class="panel">
+  <div class="panel-title">&#9312; FAIR Platform &mdash; TriboCore KIDaT</div>
+  <div class="panel-sub">End-to-end pipeline: raw instrument CSV to queryable knowledge graph in under 30 seconds per batch.</div>
+
+  <div class="pain-row">
+    <div class="pain-card">
+      <div class="pain-icon">&#128196;</div>
+      <div class="pain-title">Heterogeneous formats</div>
+      <div class="pain-text">Tribometer, rheometer, FTIR &mdash; each with proprietary file formats and isolated result folders. No shared schema between instruments.</div>
+    </div>
+    <div class="pain-card">
+      <div class="pain-icon">&#128274;</div>
+      <div class="pain-title">Knowledge loss</div>
+      <div class="pain-text">Expert context lost at personnel changes; experimental insights not machine-readable. Cross-method comparison requires manual Excel stitching.</div>
+    </div>
+    <div class="pain-card">
+      <div class="pain-icon">&#129302;</div>
+      <div class="pain-title">AI barrier</div>
+      <div class="pain-text">Machine learning impossible without months of data harmonisation work. Each new method doubles the integration effort in isolated silos.</div>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipe-step"><div class="pipe-icon">&#128196;</div><div class="pipe-label">Raw CSV</div><div class="pipe-sub">Instrument output per measurement</div></div>
+    <div class="pipeline-gap"></div>
+    <div class="pipe-step"><div class="pipe-icon">&#128214;</div><div class="pipe-label">file_reader</div><div class="pipe-sub">Header parse, encoding fallbacks</div></div>
+    <div class="pipeline-gap"></div>
+    <div class="pipe-step"><div class="pipe-icon">&#9881;</div><div class="pipe-label">52+ Kennwerte</div><div class="pipe-sub">EHL, Stribeck, Hertz</div></div>
+    <div class="pipeline-gap"></div>
+    <div class="pipe-step"><div class="pipe-icon">&#128203;</div><div class="pipe-label">FAIR-JSON</div><div class="pipe-sub">PROV-O, material_ball, date</div></div>
+    <div class="pipeline-gap"></div>
+    <div class="pipe-step"><div class="pipe-icon">&#128455;</div><div class="pipe-label">SQLite</div><div class="pipe-sub">Local queryable store</div></div>
+    <div class="pipeline-gap"></div>
+    <div class="pipe-step"><div class="pipe-icon">&#128279;</div><div class="pipe-label">Neo4j + Fuseki</div><div class="pipe-sub">Cypher / SPARQL</div></div>
+    <div class="pipeline-gap"></div>
+    <div class="pipe-step"><div class="pipe-icon">&#129302;</div><div class="pipe-label">ML + Chatbot</div><div class="pipe-sub">RF, GPR, NL-to-SQL</div></div>
+  </div>
+
+  <div class="callout callout-navy">
+    <strong style="color:#9dd3f7;">TriboCore answers:</strong>
+    &ldquo;Which PFAS-free lubricant minimises CoF at 1 GPa Hertz pressure?&rdquo; &mdash; in under 1 second via SPARQL.
+    No manual data extraction. No cross-file lookup. One query.
+  </div>
+
+  <div style="margin-top:18px;">
+    <div class="chart-title" style="margin-bottom:10px;">Methods integrated into the FAIR pipeline</div>
+        <!-- @@AUTO_PLATFORM_METHODS@@ -->
+    <div class="data-table-wrap">
+      <table style="border-collapse:collapse;width:100%;font-size:12px;">
+        <thead><tr>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);text-align:left;">Method</th>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);">Category</th>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);">Principle</th>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);">Norm</th>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);text-align:right;">n</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">B3P</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">Tribological</td><td style="padding:7px 12px;border:1px solid var(--grid);">Ball-on-3-plates sliding (Stribeck)</td><td style="padding:7px 12px;border:1px solid var(--grid);">DIN 51834-2</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:right;">277</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">GLEX</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">Tribological</td><td style="padding:7px 12px;border:1px solid var(--grid);">Reciprocating sliding</td><td style="padding:7px 12px;border:1px solid var(--grid);">DIN 51834-1</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:right;">32</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">EIS</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">Characterization</td><td style="padding:7px 12px;border:1px solid var(--grid);">Electrochemical impedance spectroscopy</td><td style="padding:7px 12px;border:1px solid var(--grid);">—</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:right;">68</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">Rheo_Rotation</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">Characterization</td><td style="padding:7px 12px;border:1px solid var(--grid);">Rotational rheometry eta(T)</td><td style="padding:7px 12px;border:1px solid var(--grid);">DIN 53019</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:right;">46</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">Rheo_Oscillation</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">Characterization</td><td style="padding:7px 12px;border:1px solid var(--grid);">Oscillatory rheometry G*, G''</td><td style="padding:7px 12px;border:1px solid var(--grid);">DIN 53019</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:right;">204</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">IR_Spectroscopy</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">Characterization</td><td style="padding:7px 12px;border:1px solid var(--grid);">ATR-FTIR (functional groups, aging)</td><td style="padding:7px 12px;border:1px solid var(--grid);">—</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:right;">168</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">Raman</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">Characterization</td><td style="padding:7px 12px;border:1px solid var(--grid);">Raman (sp2/sp3 ratio, D/G band)</td><td style="padding:7px 12px;border:1px solid var(--grid);">—</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:right;">43</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">DC_Conductivity</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">Characterization</td><td style="padding:7px 12px;border:1px solid var(--grid);">DC electrical conductivity</td><td style="padding:7px 12px;border:1px solid var(--grid);">—</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:right;">28</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- @@/AUTO_PLATFORM_METHODS@@ -->
+  </div>
+</div>
+
+<!-- ===== TAB 2: DLC RESULTS ===== -->
+<div id="panel-dlc" class="panel">
+  <div class="panel-title">&#9313; DLC Results &mdash; B3P SupraSlide Project</div>
+  <div class="panel-sub">Ball-on-3-Plates (DIN EN 12156) &middot; 20 N normal force &middot; SupraSlide lubricants &middot; 20 &deg;C and 80 &deg;C &middot; Stribeck curves with automated regime classification.</div>
+
+  <div class="chart-card" style="margin-bottom:18px;">
+    <div class="chart-title">Mean CoF by Coating and Lubricant Condition</div>
+    <div class="chart-sub">Horizontal bar chart &middot; Stribeck minimum CoF &middot; n = 3 repeat experiments per condition &middot; Lower values indicate lower friction in this test configuration</div>
+    <div class="chart-wrap tall"><canvas id="chartDLC"></canvas></div>
+  </div>
+
+  <div class="insight-row">
+    <div class="insight blue">
+      <b>ta-C achieves Stribeck CoF minimum 0.005&ndash;0.025 under PAO lubrication</b>
+      <p>Factor 3&ndash;5x lower than uncoated 100Cr6 reference under identical conditions. The minimum occurs in the mixed/EHD regime where the DLC surface chemistry interaction with PAO is most effective.</p>
+    </div>
+    <div class="insight blue">
+      <b>12 Kennwerte automatically extracted per Stribeck curve</b>
+      <p>Boundary CoF, mixed-regime slope, hydrodynamic onset velocity, EHD film thickness (Hamrock-Dowson), Lambda ratio, and 7 additional regime-classification values &mdash; per experiment, automatically.</p>
+    </div>
+    <div class="insight blue">
+      <b>EHL film thickness: cross-modal Kennwert</b>
+      <p>h_c (Hamrock-Dowson 1977) computed from LSM surface roughness (Ra, Rq) + rheometry viscosity (eta at 40 &deg;C, pressure-viscosity coefficient alpha). One Kennwert bridges three measurement methods.</p>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Stribeck Regime Summary</div>
+    <div class="chart-sub">Static overview of CoF ranges and transition velocities per regime &middot; Data from automated regime classifier</div>
+    <div class="data-table-wrap" style="margin-top:10px;">
+      <table style="border-collapse:collapse;width:100%;font-size:12px;">
+        <thead><tr>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);text-align:left;">Coating / Condition</th>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);">Boundary CoF</th>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);">Mixed CoF</th>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);">Hydrodynamic CoF</th>
+          <th style="background:#f0efec;font-size:11px;font-weight:700;color:var(--ink2);padding:8px 12px;border:1px solid var(--grid);">Transition v (m/s)</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">ta-C (PAO)</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.08&ndash;0.12</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.005&ndash;0.025</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.005&ndash;0.015</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.01&ndash;0.05</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">a-C:H (PAO)</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.09&ndash;0.13</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.03&ndash;0.06</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.02&ndash;0.04</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.03&ndash;0.08</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">a-C:H:Si (PAO)</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.09&ndash;0.13</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.04&ndash;0.07</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.03&ndash;0.05</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.02&ndash;0.07</td></tr>
+          <tr><td style="padding:7px 12px;border:1px solid var(--grid);font-weight:500;">100Cr6 ref (PAO)</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.10&ndash;0.15</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.05&ndash;0.10</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.03&ndash;0.06</td><td style="padding:7px 12px;border:1px solid var(--grid);text-align:center;">0.05&ndash;0.20</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 3: ML & SHAP ===== -->
+<div id="panel-ml" class="panel">
+  <div class="panel-title">&#9314; ML &amp; SHAP &mdash; CoF Prediction for DLC Contacts</div>
+  <div class="panel-sub">Random Forest trained on B3P SupraSlide experiments &middot; GroupKFold cross-validation &middot; SHAP feature importance for physical interpretability.</div>
+
+  <div class="chart-card" style="margin-bottom:18px;">
+    <div class="chart-title">GroupKFold Cross-Validation Schema</div>
+    <div class="chart-sub">Groups = unique experimental conditions (material x lubricant x condition x temperature x protocol) &mdash; prevents data leakage from repeat experiments</div>
+    <div class="kfold-legend">
+      <span><span class="kfold-swatch" style="background:#a8c8f0;"></span>Train</span>
+      <span><span class="kfold-swatch" style="background:#E69F00;"></span>Test</span>
+    </div>
+    <div class="kfold-grid">
+      <div class="kfold-col">
+        <div class="kfold-hdr">Fold 1</div>
+        <div class="kfold-test"></div><div class="kfold-train"></div><div class="kfold-train"></div><div class="kfold-train"></div><div class="kfold-train"></div>
+      </div>
+      <div class="kfold-col">
+        <div class="kfold-hdr">Fold 2</div>
+        <div class="kfold-train"></div><div class="kfold-test"></div><div class="kfold-train"></div><div class="kfold-train"></div><div class="kfold-train"></div>
+      </div>
+      <div class="kfold-col">
+        <div class="kfold-hdr">Fold 3</div>
+        <div class="kfold-train"></div><div class="kfold-train"></div><div class="kfold-test"></div><div class="kfold-train"></div><div class="kfold-train"></div>
+      </div>
+      <div class="kfold-col">
+        <div class="kfold-hdr">Fold 4</div>
+        <div class="kfold-train"></div><div class="kfold-train"></div><div class="kfold-train"></div><div class="kfold-test"></div><div class="kfold-train"></div>
+      </div>
+      <div class="kfold-col">
+        <div class="kfold-hdr">Fold 5</div>
+        <div class="kfold-train"></div><div class="kfold-train"></div><div class="kfold-train"></div><div class="kfold-train"></div><div class="kfold-test"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:18px;">
+    <div class="chart-title">RF Feature Importance (SHAP) &mdash; CoF Prediction</div>
+    <div class="chart-sub">Mean |SHAP value| aggregated over all experiments &middot; Gradient: #003366 (highest) to #7BA7D0 (lowest)</div>
+    <div class="chart-wrap"><canvas id="chartSHAP"></canvas></div>
+  </div>
+
+  <div class="r2-row">
+    <div class="r2-card">
+      <h4>Model A &mdash; All conditions <span class="badge-g">All conditions</span></h4>
+      <div class="r2-val">R&sup2; = 0.60</div>
+      <div style="font-size:12px;color:var(--ink2);margin-top:6px;">&plusmn; 0.15 &middot; n = 132 &middot; GroupKFold k=5</div>
+      <div style="font-size:12px;color:var(--ink2);margin-top:4px;">Includes lubricated + dry experiments. Hertz pressure accounts for the largest share of explained variance.</div>
+    </div>
+    <div class="r2-card">
+      <h4>Model C &mdash; Lubricated only <span class="badge-b">Lubricated only</span></h4>
+      <div class="r2-val">R&sup2; = 0.28</div>
+      <div style="font-size:12px;color:var(--ink2);margin-top:6px;">&plusmn; 0.13 &middot; n = 104 &middot; GroupKFold k=5</div>
+      <div style="font-size:12px;color:var(--ink2);margin-top:4px;">Lubrication regime transitions introduce variability not captured by static contact geometry features alone.</div>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <strong>Physical insight:</strong>
+    Contact geometry (Hertz pressure) is the dominant optimisation lever &mdash; ahead of coating composition and lubricant viscosity.
+    This provides a statistically grounded priority for experimental design: reducing Hertz pressure via geometry changes
+    (larger contact radius, softer substrate) may yield larger CoF reductions than coating or lubricant selection.
+  </div>
+</div>
+
+<!-- ===== TAB 4: KG & INDUSTRY ===== -->
+<div id="panel-kg" class="panel">
+  <div class="panel-title">&#9315; Knowledge Graph &amp; Industry Relevance</div>
+  <div class="panel-sub">Section A: Cross-method knowledge graph structure and SPARQL queryability. Section B: Industrial and regulatory applications.</div>
+
+  <div class="section-heading">Section A &mdash; Knowledge Graph</div>
+
+  <div class="kg-wrap">
+    <div class="kg-svg-wrap"><svg id="kg-svg" width="100%" height="460"></svg></div>
+    <div class="kg-sidebar">
+      <div class="kg-card">
+        <div class="kg-card-title">Node types</div>
+        <div class="kg-leg-item"><svg class="kg-leg-icon" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="2" fill="#0072B2"/></svg>Tribological exp.</div>
+        <div class="kg-leg-item"><svg class="kg-leg-icon" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#CC79A7"/></svg>Characterisation exp.</div>
+        <div class="kg-leg-item"><svg class="kg-leg-icon" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#888"/></svg>Material</div>
+        <div class="kg-leg-item"><svg class="kg-leg-icon" viewBox="0 0 14 14"><polygon points="7,1 13,7 7,13 1,7" fill="#1baf7a"/></svg>Lubricant</div>
+        <div class="kg-leg-item"><svg class="kg-leg-icon" viewBox="0 0 14 14"><polygon points="7,1 13,13 1,13" fill="#4a3aa7"/></svg>Project</div>
+        <div class="kg-leg-item"><svg class="kg-leg-icon" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="#9061e5"/></svg>RepeatGroup</div>
+      </div>
+      <div class="kg-card">
+        <div class="kg-card-title">Edge types</div>
+        <div class="kg-leg-item" style="font-size:10px;gap:4px;"><span style="display:inline-block;width:20px;border-top:2px dashed #D55E00;"></span>HAS_COMPLEMENTARY_DATA</div>
+        <div class="kg-leg-item" style="font-size:10px;gap:4px;"><span style="display:inline-block;width:20px;border-top:2px solid #1baf7a;"></span>USES_LUBRICANT</div>
+        <div class="kg-leg-item" style="font-size:10px;gap:4px;"><span style="display:inline-block;width:20px;border-top:2px solid #888;"></span>USES_MATERIAL</div>
+        <div class="kg-leg-item" style="font-size:10px;gap:4px;"><span style="display:inline-block;width:20px;border-top:2px solid #4a3aa7;"></span>PART_OF_PROJECT</div>
+      </div>
+      <div class="kg-card">
+        <div class="kg-card-title">Graph facts</div>
+        <div class="kg-info"><b>~2 600</b> total nodes<br><b>~985</b> Experiment nodes<br><b>~985</b> prov:Activity nodes<br><b>~80</b> RepeatGroup nodes<br><b>100</b> Cypher checks<br><b>162</b> SPARQL checks</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-row" style="grid-template-columns:repeat(3,1fr);margin-top:14px;">
+    <div class="stat-tile"><div class="stat-tile-val">HAS_COMPLEMENTARY_DATA</div><div class="stat-tile-lbl">Cross-method edges (B3P &lt;-&gt; Rheo/EIS/IR)</div></div>
+    <div class="stat-tile"><div class="stat-tile-val">localhost:3030</div><div class="stat-tile-lbl">SPARQL endpoint (Fuseki, local dev)</div></div>
+    <div class="stat-tile"><div class="stat-tile-val">0 violations</div><div class="stat-tile-lbl">SHACL shapes validation (pyshacl)</div></div>
+  </div>
+
+  <div class="sparql-block">
+<span class="cmt"># PFAS-free lubricant with CoF &lt; 0.08 and low GWP</span>
+<span class="kw">SELECT</span> ?exp ?cof ?lubricant ?pfas ?gwp <span class="kw">WHERE</span> {
+  ?exp tc:method <span class="str">"B3P"</span> ; tc:cofMean ?cof ;
+       tc:usesLubricant ?lub .
+  ?lub rdfs:label ?lubricant ;
+       tc:pfasStatus ?pfas ; tc:gwpKgCo2eq ?gwp .
+  <span class="kw">FILTER</span>(?cof &lt; 0.08 &amp;&amp; ?pfas = <span class="str">"free"</span> &amp;&amp; ?gwp &lt; 3.0)
+} <span class="kw">ORDER BY</span> ?cof
+  </div>
+
+  <div class="section-heading">Section B &mdash; Industrial &amp; Regulatory Relevance</div>
+
+    <!-- @@AUTO_INDUSTRY_CARDS@@ -->
+  <div class="insight-row">
+    <div class="insight blue">
+      <b>Circular Economy &mdash; GearOilLoop</b>
+      <p>28 B3P + 18 EIS measurements on identical gear oil samples across aging stages. DC resistance drops 37x under 42-day aging (46.6 to 1.25 GOhm) while B3P CoF shows non-monotonic response &mdash; EP additive activation at early aging stage. Cross-method KG enables data-driven recycled oil qualification.</p>
+    </div>
+    <div class="insight blue">
+      <b>PFAS-Free Lubricant Selection</b>
+      <p>Every lubricant in the knowledge graph carries PFAS status, GWP (kg CO2-eq/kg), and SVHC classification. A SPARQL query selects regulatory-compliant lubricants meeting tribological performance thresholds in under 1 second.</p>
+    </div>
+    <div class="insight blue">
+      <b>Digital Product Pass (ESPR 2027)</b>
+      <p>Machine-readable tribological data with PROV-O provenance traces &mdash; direct DPP data feed. Validated against PMDco v3.0 and SHACL shapes (0 violations). Implemented and operational, not planned.</p>
+    </div>
+  </div>
+  <!-- @@/AUTO_INDUSTRY_CARDS@@ -->
+
+  <div class="contact-card">
+    <strong>Request a demo or discuss collaboration:</strong>
+    tobias.amann@iwm.fraunhofer.de &middot; Fraunhofer IWM, Wöhlerstrasse 11, 79108 Freiburg im Breisgau
+  </div>
+</div>
+
+<div id="tt"></div>
+
+<script>
+/* @@AUTO_DLC_CHART_DATA@@ */
+const DLC_LABELS = ["ta-C (SupraSlide)", "a-C:H (SupraSlide)", "a-C:H:Si (SupraSlide)", "100Cr6 ref (SupraSlide)"];
+const DLC_COF    = [0.0133, 0.0142, 0.0153, 0.0569];
+const DLC_COLORS = ["#0072B2", "#009E73", "#56B4E9", "#D55E00"];
+/* @@/AUTO_DLC_CHART_DATA@@ */
+
+const alpha = (hex, a) => hex + Math.round(a * 255).toString(16).padStart(2, '0');
+
+new Chart(document.getElementById('chartDLC'), {
+  type: 'bar',
+  data: {
+    labels: DLC_LABELS,
+    datasets: [{
+      data: DLC_COF,
+      backgroundColor: DLC_COLORS.map(c => alpha(c, 0.82)),
+      borderColor: DLC_COLORS,
+      borderWidth: 1.5,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => 'Mean CoF: ' + ctx.raw.toFixed(3) } }
+    },
+    scales: {
+      x: { grid:{color:'#e1e0d9'}, ticks:{font:{size:11}}, beginAtZero:true, max:0.55,
+           title:{display:true, text:'Mean Coefficient of Friction (-)', font:{size:11}} },
+      y: { grid:{color:'#e1e0d9'}, ticks:{font:{size:12}} }
+    }
+  }
+});
+
+/* @@AUTO_SHAP_DATA@@ */
+const SHAP_LABELS = ["Hertz peak pressure", "EHL film thickness h_c", "Lambda ratio h/Rq", "Sliding velocity", "Viscosity 40C", "Material hardness HV1", "Contact radius", "Normal force"];
+const SHAP_VALUES = [35, 18, 14, 10, 8, 6, 5, 4];
+const SHAP_COLORS = ["#003366", "#0a4080", "#1a5799", "#2b6eb3", "#4485c2", "#5e9cd1", "#7ab4de", "#98ccec"];
+/* @@/AUTO_SHAP_DATA@@ */
+
+new Chart(document.getElementById('chartSHAP'), {
+  type: 'bar',
+  data: {
+    labels: SHAP_LABELS,
+    datasets: [{
+      data: SHAP_VALUES,
+      backgroundColor: SHAP_COLORS.map(c => alpha(c, 0.88)),
+      borderColor: SHAP_COLORS,
+      borderWidth: 1,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => 'SHAP importance: ' + ctx.raw + ' %' } }
+    },
+    scales: {
+      x: { grid:{color:'#e1e0d9'}, ticks:{font:{size:11}}, beginAtZero:true, max:40,
+           title:{display:true, text:'Mean |SHAP value| (%)', font:{size:11}} },
+      y: { grid:{color:'#e1e0d9'}, ticks:{font:{size:11}} }
+    }
+  }
+});
+
+// ======================================================
+// KNOWLEDGE GRAPH — D3 v7 force-directed (same structure as pumpen_template.html)
+// ======================================================
+function initKG() {
+  const svg = d3.select('#kg-svg');
+  const W = svg.node().clientWidth || 700, H = 460;
+  svg.attr('viewBox', '0 0 ' + W + ' ' + H);
+  const g = svg.append('g');
+  svg.call(d3.zoom().scaleExtent([.3, 3]).on('zoom', e => g.attr('transform', e.transform)));
+
+    /* @@AUTO_KG_GFT_DATA@@ */
+  const KG_NODES = [
+    {id:"B3P",           label:"B3P",           group:"tribo",      count:277},
+    {id:"GLEX",          label:"GLEX",          group:"tribo",      count:32},
+    {id:"EIS",           label:"EIS",           group:"charact",    count:68},
+    {id:"Rheo_Rotation", label:"Rheo Rot.",     group:"charact",    count:46},
+    {id:"IR",            label:"IR/FTIR",       group:"charact",    count:168},
+    {id:"taC",           label:"ta-C",          group:"material",   count:null},
+    {id:"100Cr6",        label:"100Cr6",        group:"material",   count:null},
+    {id:"SupraSlideOil", label:"SupraSlide Oil",group:"lubricant",  count:null},
+    {id:"PAO",           label:"PAO",           group:"lubricant",  count:null},
+    {id:"SupraSlide",    label:"SupraSlide",    group:"project",    count:null},
+    {id:"GearOilLoop",   label:"GearOilLoop",   group:"project",    count:null},
+    {id:"RG_B3P",        label:"RepeatGroup",   group:"repeatgroup",count:null}
+  ];
+  const KG_LINKS = [
+    {source:"B3P",           target:"EIS",           type:"HAS_COMPLEMENTARY_DATA"},
+    {source:"B3P",           target:"Rheo_Rotation", type:"HAS_COMPLEMENTARY_DATA"},
+    {source:"GLEX",          target:"Rheo_Rotation", type:"HAS_COMPLEMENTARY_DATA"},
+    {source:"B3P",           target:"SupraSlideOil", type:"USES_LUBRICANT"},
+    {source:"GLEX",          target:"SupraSlideOil", type:"USES_LUBRICANT"},
+    {source:"EIS",           target:"SupraSlideOil", type:"USES_LUBRICANT"},
+    {source:"Rheo_Rotation", target:"SupraSlideOil", type:"USES_LUBRICANT"},
+    {source:"B3P",           target:"taC",           type:"USES_MATERIAL"},
+    {source:"B3P",           target:"100Cr6",        type:"USES_MATERIAL"},
+    {source:"GLEX",          target:"taC",           type:"USES_MATERIAL"},
+    {source:"B3P",           target:"SupraSlide",    type:"PART_OF_PROJECT"},
+    {source:"GLEX",          target:"SupraSlide",    type:"PART_OF_PROJECT"},
+    {source:"B3P",           target:"GearOilLoop",   type:"PART_OF_PROJECT"},
+    {source:"B3P",           target:"RG_B3P",        type:"HAS_REPEAT_GROUP"}
+  ];
+  /* @@/AUTO_KG_GFT_DATA@@ */
+
+  const nodeMap = {};
+  KG_NODES.forEach(n => nodeMap[n.id] = n);
+  const adj = {};
+  KG_NODES.forEach(n => adj[n.id] = new Set());
+  KG_LINKS.forEach(l => { adj[l.s].add(l.t); adj[l.t].add(l.s); });
+
+  const nodes = KG_NODES.map(d => ({...d}));
+  const links = KG_LINKS.map(d => ({...d, source:d.s, target:d.t}));
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(90))
+    .force('charge', d3.forceManyBody().strength(-220))
+    .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('collide', d3.forceCollide(d => d.r + 14));
+
+  const link = g.append('g').selectAll('line').data(links).enter().append('line')
+    .attr('class', 'link-line')
+    .attr('stroke', d => d.stroke || '#aaa')
+    .attr('stroke-width', d => d.dash ? 1.5 : 1.1)
+    .attr('stroke-dasharray', d => d.dash ? '5,3' : null);
+
+  let pinned = null;
+  const TYPE_LABELS = {tribo:'Tribological exp.', char:'Characterisation exp.', mat:'Material', lub:'Lubricant', proj:'Project', rg:'RepeatGroup'};
+
+  const nodeG = g.append('g').selectAll('g').data(nodes).enter().append('g')
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag',  (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }))
+    .on('mouseenter', (e, d) => {
+      showTip(e, '<strong>' + d.label.replace(/\n/g, ' ') + '</strong> (' + (TYPE_LABELS[d.type] || d.type) + ')<br>Connections: ' + adj[d.id].size);
+      if (!pinned) hl(d.id);
+    })
+    .on('mousemove', moveTip)
+    .on('mouseleave', () => { hideTip(); if (!pinned) resetHl(); })
+    .on('click', (e, d) => { pinned = (pinned === d.id) ? null : d.id; if (pinned) hl(d.id); else resetHl(); });
+
+  nodeG.each(function(d) {
+    const el = d3.select(this);
+    if (d.type === 'tribo') {
+      const s = d.r * 1.8;
+      el.append('rect').attr('x', -s/2).attr('y', -s/2).attr('width', s).attr('height', s).attr('rx', 3).attr('fill', d.color).attr('class', 'node-shape');
+    } else if (d.type === 'proj') {
+      const pts = Array.from({length:6}, (_, i) => { const a = (i * 60 - 90) * Math.PI / 180; return (d.r * Math.cos(a)) + ',' + (d.r * Math.sin(a)); }).join(' ');
+      el.append('polygon').attr('points', pts).attr('fill', d.color).attr('class', 'node-shape');
+    } else if (d.type === 'lub') {
+      el.append('polygon').attr('points', '0,' + (-d.r) + ' ' + d.r + ',0 0,' + d.r + ' ' + (-d.r) + ',0').attr('fill', d.color).attr('class', 'node-shape');
+    } else {
+      el.append('circle').attr('r', d.r).attr('fill', d.color).attr('class', 'node-shape');
+    }
+    const lines = d.label.split('\n');
+    const tg = el.append('text').attr('class', 'node-label').attr('text-anchor', 'middle').attr('dy', d.r + 11);
+    if (lines.length === 1) { tg.text(d.label); }
+    else { lines.forEach((ln, i) => tg.append('tspan').attr('x', 0).attr('dy', i === 0 ? 0 : 11).text(ln)); }
+  });
+
+  function hl(id) {
+    const nb = adj[id] || new Set();
+    link.classed('highlighted', d => d.s === id || d.t === id || d.source?.id === id || d.target?.id === id)
+        .classed('dimmed',      d => !(d.s === id || d.t === id || d.source?.id === id || d.target?.id === id));
+    nodeG.selectAll('.node-shape')
+      .classed('dimmed',      function() { const d = d3.select(this.parentNode).datum(); return d.id !== id && !nb.has(d.id); })
+      .classed('highlighted', function() { return d3.select(this.parentNode).datum().id === id; });
+  }
+  function resetHl() {
+    link.classed('highlighted', false).classed('dimmed', false);
+    nodeG.selectAll('.node-shape').classed('dimmed', false).classed('highlighted', false);
+  }
+  sim.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    nodeG.attr('transform', d => 'translate(' + d.x + ',' + d.y + ')');
+  });
+}
+
+// ======================================================
+// TAB SWITCHING + TOOLTIP
+// ======================================================
+const TAB_NAMES = ['overview', 'platform', 'dlc', 'ml', 'kg'];
+let kgInit = false;
+
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  const idx = TAB_NAMES.indexOf(name);
+  document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
+  if (name === 'kg' && !kgInit) { kgInit = true; setTimeout(initKG, 60); }
+}
+
+const tt = document.getElementById('tt');
+function showTip(e, html) { tt.innerHTML = html; tt.style.display = 'block'; moveTip(e); }
+function moveTip(e) {
+  tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 320) + 'px';
+  tt.style.top  = Math.min(e.clientY + 14, window.innerHeight - 120) + 'px';
+}
+function hideTip() { tt.style.display = 'none'; }
+</script>
+</body>
+</html>
