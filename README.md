@@ -15,7 +15,7 @@ and lubricant analytics into a structured, machine-readable knowledge graph.
 
 | Method | Geometry | Standard |
 |---|---|---|
-| B3P | Ball-on-Three-Plates | Anton Paar B74IA003EN-C |
+| B3P | Ball-on-Three-Plates | Anton Paar |
 | GLEX | Journal Bearing (vR48) | IWM internal |
 | SRV | Oscillating Ball-on-Plate | DIN 51834 |
 | Galling | Ring-on-Plate | ASTM G98 / G196 |
