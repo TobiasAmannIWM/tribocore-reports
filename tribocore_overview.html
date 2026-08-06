@@ -138,7 +138,7 @@ table.dt tbody td { padding:8px 12px; border:1px solid var(--grid); vertical-ali
 <!-- @@AUTO_HERO_GRID@@ -->
   <div class="hero-grid">
     <div class="hero-stat">
-      <div class="hero-val blue">987</div>
+      <div class="hero-val blue">1000</div>
       <div class="hero-lbl">Total experiments analysed</div>
     </div>
     <div class="hero-stat">
@@ -256,10 +256,10 @@ table.dt tbody td { padding:8px 12px; border:1px solid var(--grid); vertical-ali
           <th>Method</th><th>Category</th><th>Principle</th><th>Norm</th><th style="text-align:right">n</th>
         </tr></thead>
         <tbody>
-          <tr><td>B3P</td><td>Tribological</td><td>Ball-on-3-plates, sliding</td><td>—</td><td style="text-align:right">277</td></tr>
+          <tr><td>B3P</td><td>Tribological</td><td>Ball-on-3-plates, sliding</td><td>—</td><td style="text-align:right">285</td></tr>
           <tr><td>GLEX</td><td>Tribological</td><td>Reciprocating sliding</td><td>—</td><td style="text-align:right">32</td></tr>
           <tr><td>Galling</td><td>Tribological</td><td>Ring-on-plate, torsion</td><td>ASTM G98</td><td style="text-align:right">4</td></tr>
-          <tr><td>SRV</td><td>Tribological</td><td>Oscillating sliding</td><td>DIN 51834-2</td><td style="text-align:right">95</td></tr>
+          <tr><td>SRV</td><td>Tribological</td><td>Oscillating sliding</td><td>DIN 51834-2</td><td style="text-align:right">97</td></tr>
           <tr><td>Abrasion</td><td>Tribological</td><td>Rubber wheel abrasion</td><td>ASTM G65</td><td style="text-align:right">22</td></tr>
           <tr><td>EIS</td><td>Characterization</td><td>Electrochemical impedance</td><td>—</td><td style="text-align:right">68</td></tr>
           <tr><td>Rheo_Rotation</td><td>Characterization</td><td>Rotational rheometry</td><td>—</td><td style="text-align:right">0</td></tr>
@@ -507,8 +507,8 @@ table.dt tbody td { padding:8px 12px; border:1px solid var(--grid); vertical-ali
       <h4>HTML Client Reports</h4>
 <!-- @@AUTO_REPORTS_LIST@@ -->
       <ul>
-        <li><a href="pumpen.html">Abrasion Wear Study</a></li>
-        <li><a href="htemp_gall.html">High-Temperature Galling</a></li>
+        <li><a href="pumpen.html">Pumpen — Abrasion Wear Study (Sulzer)</a></li>
+        <li><a href="htemp_gall.html">HTempGall — High-Temperature Galling (Baker Hughes)</a></li>
         <li><a href="b3p_combined.html">B3P Combined — All Projects Overview</a></li>
         <li><a href="gol.html">GearOilLoop — B3P + EIS Multi-Method</a></li>
         <li><a href="tribocore_overview.html">TriboCore System Overview (this report)</a></li>
@@ -558,7 +558,7 @@ table.dt tbody td { padding:8px 12px; border:1px solid var(--grid); vertical-ali
         <tr><td>ML analytics (RF+SHAP+GPR)</td><td><span class="badge-ok">Implemented</span></td><td style="font-size:11px;color:var(--ink2)">Multi-method CoF prediction, Bayesian GPR with 95% confidence, EDA explorer</td></tr>
         <tr><td>AI Chatbot (NL to SQL)</td><td><span class="badge-ok">Implemented</span></td><td style="font-size:11px;color:var(--ink2)">Local Ollama LLM; all 11 methods in SQL system prompt; debug SQL visible in UI</td></tr>
         <tr><td>11 analytical methods</td><td><span class="badge-ok">Implemented</span></td><td style="font-size:11px;color:var(--ink2)">5 tribological + 6 characterisation; all integrated per CLAUDE.md Phase 0-9 checklist</td></tr>
-        <tr><td>HTML client reports</td><td><span class="badge-ok">Implemented</span></td><td style="font-size:11px;color:var(--ink2)">Abrasion Wear Study, High-Temperature Galling, B3P Combined, GearOilLoop, TriboCore Overview; fully self-contained</td></tr>
+        <tr><td>HTML client reports</td><td><span class="badge-ok">Implemented</span></td><td style="font-size:11px;color:var(--ink2)">Pumpen, HTempGall, B3P Combined, GearOilLoop, TriboCore Overview; fully self-contained</td></tr>
         <tr><td>6-point PMDco / Hartrott compliance</td><td><span class="badge-ok">Implemented</span></td><td style="font-size:11px;color:var(--ink2)">PMDco crosswalk, IAO definitions, SHACL 0 violations, named graphs, RepeatGroups, OWL hierarchy</td></tr>
         <tr><td>RepeatGroup nodes</td><td><span class="badge-ok">Implemented</span></td><td style="font-size:11px;color:var(--ink2)">Two-sheet Excel (All Results + Repeat_Groups); tc:RepeatGroup nodes with mean/std in Fuseki</td></tr>
         <tr><td>DPP / LCA data</td><td><span class="badge-ok">Implemented</span></td><td style="font-size:11px;color:var(--ink2)">GWP data in materials registry; sustainability page with per-lubricant carbon footprint</td></tr>
@@ -595,7 +595,7 @@ table.dt tbody td { padding:8px 12px; border:1px solid var(--grid); vertical-ali
 <script>
 /* @@AUTO_METHODS_CHART_DATA@@ */
 const M_LABELS = ["B3P", "GLEX", "Galling", "SRV", "Abrasion", "EIS", "Rheo_Rotation", "Rheo_Oscillation", "IR_Spectroscopy", "Raman_Spectroscopy", "DC_Conductivity"];
-const M_COUNTS = [277, 32, 4, 95, 22, 68, 0, 0, 0, 0, 28];
+const M_COUNTS = [285, 32, 4, 97, 22, 68, 0, 0, 0, 0, 28];
 const M_COLORS = ["#0072B2", "#D55E00", "#009E73", "#56B4E9", "#E69F00", "#CC79A7", "#CC79A7", "#CC79A7", "#CC79A7", "#CC79A7", "#CC79A7"];
 const M_CATS   = ["tribo", "tribo", "tribo", "tribo", "tribo", "char", "char", "char", "char", "char", "char"];
 /* @@/AUTO_METHODS_CHART_DATA@@ */
@@ -626,7 +626,9 @@ new Chart(document.getElementById('chartMethods'), {
 const ML_DATASETS = [
   { label:"B3P", color:"#0072B2", pts:[{x:0.3,y:0.06}, {x:0.5,y:0.052}, {x:0.8,y:0.068}, {x:1.1,y:0.082}, {x:1.3,y:0.095}, {x:1.6,y:0.115}] },
   { label:"GLEX", color:"#D55E00", pts:[{x:0.1,y:0.082}, {x:0.2,y:0.09}, {x:0.3,y:0.108}, {x:0.4,y:0.102}, {x:0.5,y:0.118}] },
-  { label:"SRV", color:"#56B4E9", pts:[{x:0.4,y:0.078}, {x:0.7,y:0.092}, {x:1.0,y:0.104}, {x:1.2,y:0.118}] }
+  { label:"Galling", color:"#009E73", pts:[{x:0.5,y:0.155}, {x:0.8,y:0.178}, {x:1.0,y:0.2}] },
+  { label:"SRV", color:"#56B4E9", pts:[{x:0.4,y:0.078}, {x:0.7,y:0.092}, {x:1.0,y:0.104}, {x:1.2,y:0.118}] },
+  { label:"Abrasion", color:"#E69F00", pts:[{x:0.05,y:0.23}, {x:0.06,y:0.242}, {x:0.07,y:0.258}, {x:0.08,y:0.248}] }
 ];
 /* @@/AUTO_ML_SCATTER_DATA@@ */
 
@@ -683,9 +685,9 @@ function initKG() {
   const KG_NODES = [
     {id:'proj_ss',  type:'proj',  label:'SupraSlide\nProject',     r:18, color:'#4a3aa7'},
     {id:'proj_gol', type:'proj',  label:'GOL\nProject',            r:15, color:'#4a3aa7'},
-    {id:'b3p',      type:'tribo', label:'B3P\n(n=277)',          r:14, color:'#0072B2'},
+    {id:'b3p',      type:'tribo', label:'B3P\n(n=285)',          r:14, color:'#0072B2'},
     {id:'glex',     type:'tribo', label:'GLEX\n(n=32)',        r:12, color:'#D55E00'},
-    {id:'srv',      type:'tribo', label:'SRV\n(n=95)',          r:12, color:'#56B4E9'},
+    {id:'srv',      type:'tribo', label:'SRV\n(n=97)',          r:12, color:'#56B4E9'},
     {id:'galling',  type:'tribo', label:'Galling\n(n=4)',  r:10, color:'#009E73'},
     {id:'abrasion', type:'tribo', label:'Abrasion\n(n=22)',    r:11, color:'#E69F00'},
     {id:'rheo_rot', type:'char',  label:'Rheo\nRotation',          r:13, color:'#CC79A7'},
