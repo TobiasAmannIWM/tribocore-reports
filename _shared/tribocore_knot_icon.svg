@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="TriboCore KIDaT icon">
+  <title>TriboCore KIDaT</title>
+  <!--
+    TRIBOCORE KNOT — square icon variant (100×100 viewBox).
+    Knot scaled to 80% width with vertical centering.
+    Use <img src="_shared/tribocore_knot_icon.svg" width="32" height="32">
+    or inline for favicon/header icon usage.
+    Add a rounded rect background for the "app icon" variant:
+      <rect width="100" height="100" rx="18" fill="currentColor"/>
+      → then set stroke="white" on the paths, or set currentColor to the icon fill.
+  -->
+
+  <!--
+    Spec: side positions top=26, mid=50, bot=74 (spacing 24=2s, s=12).
+    Visible content: y=[26-6=20, 74+6=80] → 60 units tall.
+    Transform: scale 200×60content → 80×24 in icon, centered in 100×100.
+    Scale: 80/200=0.4 · Translate: x=10, y=(100-60×0.4)/2 = (100-24)/2 = 38.
+  -->
+  <g transform="translate(10,38) scale(0.4)">
+
+    <!-- Middle band -->
+    <path d="M 0,50 L 200,50"
+          fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+
+    <!-- Bottom band — crosses UP through center -->
+    <path d="M 0,74 C 55,74 55,30 100,30 C 145,30 145,74 200,74"
+          fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+
+    <!-- Top band — crosses DOWN through center (on top at crossings) -->
+    <path d="M 0,26 C 55,26 55,70 100,70 C 145,70 145,26 200,26"
+          fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+
+  </g>
+</svg>

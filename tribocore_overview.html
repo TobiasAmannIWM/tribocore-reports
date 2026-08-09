@@ -117,16 +117,27 @@ table.dt tbody td { padding:8px 12px; border:1px solid var(--grid); vertical-ali
 .stat-tile-val { font-size:22px; font-weight:800; }
 .stat-tile-lbl { font-size:10px; color:var(--ink2); margin-top:2px; }
 </style>
+<link rel="icon" type="image/svg+xml" href="_shared/tribocore_knot_icon.svg">
+<link rel="stylesheet" href="_shared/tribocore.css">
 </head>
 <body>
 
-<header class="header">
-  <div class="hdr-logo">Fraunhofer IWM</div>
-  <div>
-    <div class="hdr-title">TriboCore KIDaT — System Capabilities Overview</div>
-    <div class="hdr-sub">FAIR-Ready Tribology Data Pipeline · 11 Methods · Neo4j + Fuseki Knowledge Graph · ML &amp; AI Analytics</div>
+<header class="tc-header">
+  <a class="tc-brand" href="#" style="text-decoration:none">
+    <svg class="tc-brand-knot" viewBox="0 0 200 100" fill="none" aria-hidden="true">
+      <path d="M 0,50 L 200,50" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+      <path d="M 0,74 C 55,74 55,30 100,30 C 145,30 145,74 200,74" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+      <path d="M 0,26 C 55,26 55,70 100,70 C 145,70 145,26 200,26" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+    </svg>
+    <span class="tc-brand-name">TriboCore <span>KIDaT</span></span>
+  </a>
+  <span class="tc-header-divider"></span>
+  <span style="font-size:0.85rem;font-weight:500;color:rgba(255,255,255,0.80);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0">TriboCore KIDaT — System Capabilities Overview</span>
+  <div class="tc-header-logos">
+    <img src="_shared/logos/iwm_Logo.png" alt="Fraunhofer IWM">
+    <img src="_shared/logos/KIDaT_Logo_1.png" alt="KIDaT">
   </div>
-  <div class="hdr-badge">System Overview · 2026</div>
+  <span class="tc-header-badge">System Overview · 2026</span>
 </header>
 
 <div class="hero">
@@ -830,5 +841,42 @@ function moveTip(e) {
 }
 function hideTip() { tt.style.display = 'none'; }
 </script>
+
+<footer class="tc-footer" id="tc-footer">
+  <div class="tc-footer-inner">
+    <div class="tc-footer-logos">
+      <img src="_shared/logos/iwm_Logo.png"
+           alt="Fraunhofer IWM" title="Fraunhofer-Institut für Werkstoffmechanik IWM">
+      <img src="_shared/logos/KIDaT_Logo_1.png"
+           alt="KIDaT" title="KIDaT — Knowledge Integration in Data-driven Application Technology">
+      <img src="_shared/logos/TriSys_Logo.png"
+           alt="TriSys" title="TriSys — Tribological Systems Group, Fraunhofer IWM">
+    </div>
+    <div class="tc-footer-contact">
+      <strong>Dr. Tobias Amann</strong> &middot;
+      <a href="mailto:tobias.amann@iwm.fraunhofer.de">tobias.amann@iwm.fraunhofer.de</a><br>
+      Research Group: Tribological Component Testing &amp; System Analysis &middot;
+      Fraunhofer Institute for Mechanics of Materials IWM, Freiburg
+    </div>
+    <div class="tc-footer-funding">
+      Funded by:
+      <span><strong style="color:rgba(255,255,255,0.55)">KIDaT</strong>,
+        Fraunhofer Gesellschaft &mdash; Fraunhofer SME-initiative (System Architecture &amp;
+        Digital Tribology Platform)</span>
+      <span><strong style="color:rgba(255,255,255,0.55)">DigiMat-Caps</strong>,
+        Fraunhofer Cluster of Excellence &laquo;Programmable Materials&raquo;
+        (Sustainability &amp; Digital Product Passport Integration)</span>
+    </div>
+    <div class="tc-footer-bar">
+      <span>&copy; Fraunhofer IWM &middot; TriboCore KIDaT</span>
+      <span>
+        <a href="https://github.com/TobiasAmannIWM/tribocore-reports"
+           target="_blank" rel="noopener noreferrer">
+          &#x2197; GitHub: tribocore-reports
+        </a>
+      </span>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

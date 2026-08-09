@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" role="img" aria-label="TRIBOCORE KNOT — TriboCore KIDaT brand mark">
+  <title>TRIBOCORE KNOT</title>
+  <!--
+    TRIBOCORE KNOT — Variation B3 (Optimized Convergence)
+    Spec: Strichstärke s = gap s → total 5s, centered in 100-unit height.
+    s = 12 → band centers (sides): top y=26, mid y=50, bot y=74 (spacing=24=2s ✓).
+    Band centers (center):          top y=70, mid y=50, bot y=30 (crossing +20 past middle).
+    Gap at center between bands = 8 units = 2s/3 (clearly visible at all sizes).
+    Crossing at x≈54 and x≈146 (27% from each edge — matches brand spec).
+    Draw order: mid → bot → top (top band visually on top at crossings).
+    Use: <img src="_shared/tribocore_knot.svg" height="24"> for headers.
+         Inline <svg> with currentColor for light/dark theming.
+  -->
+
+  <!-- Middle band — straight through, rendered first (behind outer bands at crossings) -->
+  <path d="M 0,50 L 200,50"
+        fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Bottom band — y=74 on sides, crosses UP to y=30 at center, then back down -->
+  <path d="M 0,74 C 55,74 55,30 100,30 C 145,30 145,74 200,74"
+        fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Top band — y=26 on sides, crosses DOWN to y=70 at center, then back up -->
+  <!-- Rendered last: top band appears over both middle and bottom at crossings -->
+  <path d="M 0,26 C 55,26 55,70 100,70 C 145,70 145,26 200,26"
+        fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+</svg>
