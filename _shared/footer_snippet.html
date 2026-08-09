@@ -1,0 +1,83 @@
+<!--
+  TRIBOCORE STANDARD FOOTER — HTML/_shared/footer_snippet.html
+  ─────────────────────────────────────────────────────────────────────────────
+  Copy this block into any TriboCore HTML file. Adjust the SHARED_PATH prefix
+  to point to HTML/_shared/ relative to the embedding file:
+
+    general/*.html            → ../  (e.g. src="../_shared/logos/iwm_Logo.png")
+    projects/*.html           → ../  (same depth)
+    projects/Sub/*.html       → ../../
+    general/Wissensgraph/*.html → ../../
+
+  Requires: tribocore.css linked in <head>
+  ─────────────────────────────────────────────────────────────────────────────
+  Replace SHARED_PATH with the correct relative prefix in each HTML file.
+  The snippet uses <!--SHARED_PATH--> as a marker for automated substitution
+  via HTML/tools/embed_footer.py (Phase 2 automation).
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+
+<footer class="tc-footer" id="tc-footer">
+  <div class="tc-footer-inner">
+
+    <!-- Logo row -->
+    <div class="tc-footer-logos">
+      <img src="SHARED_PATH_shared/logos/iwm_Logo.png"
+           alt="Fraunhofer IWM" title="Fraunhofer-Institut für Werkstoffmechanik IWM">
+      <img src="SHARED_PATH_shared/logos/KIDaT_Logo_1.png"
+           alt="KIDaT" title="KIDaT — Knowledge Integration in Data-driven Application Technology">
+      <img src="SHARED_PATH_shared/logos/TriSys_Logo.png"
+           alt="TriSys" title="TriSys — Tribological Systems Group, Fraunhofer IWM">
+    </div>
+
+    <!-- Contact block -->
+    <div class="tc-footer-contact">
+      <strong>Dr. Tobias Amann</strong> &middot;
+      <a href="mailto:tobias.amann@iwm.fraunhofer.de">tobias.amann@iwm.fraunhofer.de</a><br>
+      Research Group: Tribological Component Testing &amp; System Analysis &middot;
+      Fraunhofer Institute for Mechanics of Materials IWM, Freiburg
+    </div>
+
+    <!-- Funding acknowledgement -->
+    <div class="tc-footer-funding">
+      Funded by:
+      <span><strong style="color:rgba(255,255,255,0.55)">KIDaT</strong>,
+        Fraunhofer Gesellschaft — Fraunhofer SME-initiative (System Architecture &amp;
+        Digital Tribology Platform)</span>
+      <span><strong style="color:rgba(255,255,255,0.55)">DigiMat-Caps</strong>,
+        Fraunhofer Cluster of Excellence &laquo;Programmable Materials&raquo;
+        (Sustainability &amp; Digital Product Passport Integration)</span>
+    </div>
+
+    <!-- Bottom bar: copyright + GitHub -->
+    <div class="tc-footer-bar">
+      <span>&copy; Fraunhofer IWM &middot; TriboCore KIDaT</span>
+      <span>
+        <a href="https://github.com/TobiasAmannIWM/tribocore-reports"
+           target="_blank" rel="noopener noreferrer">
+          &#x2197; GitHub: tribocore-reports
+        </a>
+      </span>
+    </div>
+
+  </div><!-- /.tc-footer-inner -->
+</footer>
+
+<!--
+  JavaScript helper: automatically fixes logo paths based on this file's depth.
+  Include this block immediately after the <footer> if you need path auto-detection.
+  (Not needed if you manually set SHARED_PATH above.)
+
+<script>
+(function() {
+  // Resolve _shared/ relative to current page depth
+  var depth = window.location.pathname.split('/').filter(Boolean).length;
+  // depth 2 = general/file.html → prefix "../"
+  // depth 3 = projects/Sub/file.html → prefix "../../"
+  var prefix = Array(depth - 1).fill('..').join('/') + (depth > 1 ? '/' : '');
+  document.querySelectorAll('#tc-footer img[src^="SHARED_PATH"]').forEach(function(img) {
+    img.src = img.src.replace(/^.*SHARED_PATH/, prefix);
+  });
+})();
+</script>
+-->

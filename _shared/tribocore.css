@@ -15,7 +15,7 @@
  * Migrate existing .header, .hero, .tab-btn etc. to .tc-* in Phase 4.
  */
 
-/* ── Google Fonts (online) ──────────────────────────────────────────────── */
+/* ── Google Fonts (online; graceful fallback to system-ui when offline) ─── */
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 /* ── Custom properties ──────────────────────────────────────────────────── */
