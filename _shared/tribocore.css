@@ -140,15 +140,20 @@
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.2rem;
+  background: rgba(255,255,255,0.92);
+  padding: 3px 10px;
+  border-radius: 5px;
+  flex-shrink: 0;
 }
 
 .tc-header-logos img {
   height: 22px;
   width: auto;
   object-fit: contain;
-  filter: brightness(0) invert(1);
-  opacity: 0.75;
+  opacity: 1.0;
+  /* No filter: logos shown in original colors on white-pill background.
+     Works for any PNG (transparent-bg or opaque-bg) against the dark header. */
 }
 
 /* Project / context badge */
@@ -479,14 +484,19 @@
   gap: 2rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
+  background: rgba(255,255,255,0.90);
+  padding: 8px 16px;
+  border-radius: 7px;
+  width: fit-content;
 }
 
 .tc-footer-logos img {
   height: 28px;
   width: auto;
   object-fit: contain;
-  filter: brightness(0) invert(1);
-  opacity: 0.65;
+  /* No filter: logos shown in original colors on the footer background.
+     Same approach as header: works for any PNG (transparent-bg or opaque). */
+  opacity: 0.80;
   transition: opacity 0.15s;
 }
 
@@ -563,11 +573,12 @@
    ════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   /* ── Header: hide badge to give logos room ── */
-  .tc-header          { padding: 0 1rem; height: 48px; overflow: hidden; }
-  .tc-header-badge    { display: none; }   /* primary fix — badge is ~175px wide */
+  .tc-header          { padding: 0 1rem; height: 48px; overflow-y: hidden; }
+  .tc-header-badge    { display: none; }
   .tc-brand-name      { font-size: 0.85rem; }
-  .tc-header-logos    { gap: 0.5rem; }
-  .tc-header-logos img { height: 18px; }
+  .tc-header-logos    { gap: 0.6rem; padding: 2px 7px; }
+  .tc-header-logos img { height: 16px; }
+  .lang-switch        { display: none; }   /* hide lang-switch on narrow screens to give logos room */
 
   .tc-hero         { padding: 1.75rem 1rem 1.5rem; }
   .tc-stats-grid   { grid-template-columns: 1fr 1fr; }
